@@ -7,7 +7,6 @@ import snakeladder.game.custom.CustomGGButton;
 import snakeladder.utility.ServicesRandom;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 @SuppressWarnings("serial")
@@ -196,6 +195,19 @@ public class NavigationPane extends GameGrid
     return RANDOM_ROLL_TAG;
   }
 
+  public void onclickToggleButton(boolean toClick){
+    // 如果有变动，换全部
+    //用负一
+    if(toggleCheck.isChecked() && !toClick){
+      toggleCheck.setChecked(false);
+      gp.reverseAllConnections();
+    }
+    else if(!toggleCheck.isChecked() && toClick){
+      toggleCheck.setChecked(true);
+      gp.reverseAllConnections();
+    }
+  }
+
   void createGui()
   {
     addActor(new Actor("sprites/dieboard.gif"), dieBoardLocation);
@@ -218,6 +230,7 @@ public class NavigationPane extends GameGrid
       @Override
       public void buttonChecked(GGCheckButton ggCheckButton, boolean checked) {
         isToggle = checked;
+        gp.reverseAllConnections();
       }
     });
 
@@ -269,6 +282,10 @@ public class NavigationPane extends GameGrid
   {
     resultField.setText(text);
     System.out.println("Result: " + text);
+
+    for (Puppet p:gp.getAllPuppets()){
+      System.out.println(p.getRecord());
+    }
   }
 
   void prepareRoll(int currentIndex)

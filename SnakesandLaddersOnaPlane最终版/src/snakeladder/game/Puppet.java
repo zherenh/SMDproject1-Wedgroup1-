@@ -2,8 +2,6 @@ package snakeladder.game;
 
 import ch.aplu.jgamegrid.*;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Puppet extends Actor
 {
@@ -19,9 +17,8 @@ public class Puppet extends Actor
 
   private boolean isLowestValue;
 
-  /*
-  !!! 没用到
-   */
+  private ToggleState toggleState = new ToggleState();
+
   private boolean isOverlap = false;
 
   public void setOverlap(boolean isOverlap){
@@ -31,12 +28,19 @@ public class Puppet extends Actor
   public boolean getIsOverlap(){
     return this.isOverlap;
   }
+  private Record record;
+  public Record getRecord(){
+    return this.record;
+  }
 
-  Puppet(GamePane gp, NavigationPane np, String puppetImage)
+  Puppet(GamePane gp, NavigationPane np, String puppetImage,String puppetName)
   {
     super(puppetImage);
     this.gamePane = gp;
     this.navigationPane = np;
+    this.puppetName = puppetName;
+    this.record =new Record(puppetName, np);
+
   }
 
   public boolean isAuto() {
@@ -63,6 +67,9 @@ public class Puppet extends Actor
       setLocation(gamePane.startLocation);
     }
     this.nbSteps = nbSteps;
+    if (nbSteps > 0){
+      record.recordRolled(nbSteps);
+    }
 
     // check is lowest step
     isLowestValue = nbSteps / navigationPane.getNumberOfDice() == 1;
@@ -171,6 +178,11 @@ public class Puppet extends Actor
             navigationPane.showStatus("Climbing...");
             navigationPane.playSound(GGSound.BOING);
           }
+          if (currentCon.cellEnd > currentCon.cellStart){
+            record.up();
+          }else {
+            record.down();
+          }
         }
         else
         {
@@ -178,6 +190,9 @@ public class Puppet extends Actor
 //          isOverlap = false;
 //          navigationPane.prepareRoll(cellIndex);
         }
+
+
+
       }
     }
 
@@ -218,11 +233,26 @@ public class Puppet extends Actor
             navigationPane.showStatus("Climbing...");
             navigationPane.playSound(GGSound.BOING);
           }
+          if (currentCon.cellEnd > currentCon.cellStart){
+            record.up();
+          }else {
+            record.down();
+          }
         }
         else
         {
           setActEnabled(false);
           navigationPane.prepareRoll(cellIndex);
+        }
+
+        // 需要测试，need more tests about whether the auto toggle algorithm is correct
+        if(isAuto) {
+          boolean toToggle = toggleState.onclickToggle(navigationPane, gamePane);
+          if (toToggle) {
+            navigationPane.onclickToggleButton(true);
+          } else {
+            navigationPane.onclickToggleButton(false);
+          }
         }
       }
     }

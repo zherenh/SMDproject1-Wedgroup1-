@@ -22,6 +22,9 @@ public class GamePane extends GameGrid
   public static final int NUMBER_VERTICAL_CELLS = 10;
   private final int MAX_PUPPET_SPRITES = 4;
 
+  public List<Connection> getConnections(){
+    return this.connections;
+  }
 
   public int getCurrentPuppetIndex(){
     return this.currentPuppetIndex;
@@ -67,10 +70,11 @@ public class GamePane extends GameGrid
   {
     for (int i = 0; i < numberOfPlayers; i++) {
       boolean isAuto = playerManualMode.get(i);
+//      System.out.println(isAuto);
       int spriteImageIndex = i % MAX_PUPPET_SPRITES;
       String puppetImage = "sprites/cat_" + spriteImageIndex + ".gif";
 
-      Puppet puppet = new Puppet(this, np, puppetImage);
+      Puppet puppet = new Puppet(this, np, puppetImage,"Player " + (i + 1));
       puppet.setAuto(isAuto);
       puppet.setPuppetName("Player " + (i + 1));
       addActor(puppet, startLocation);
@@ -138,5 +142,11 @@ public class GamePane extends GameGrid
     double b = (double)(y1 * x0 - y0 * x1) / (y1 - y0);
     return (int)(a * y + b);
   }
+
+  public void reverseAllConnections(){
+    for (Connection connection : connections){
+      connection.reverseConnection();
+    }
+}
 
 }
